@@ -78,7 +78,9 @@ export default defineConfig({
 				},
 			},
 		},
-		plugins: [externalizeDepsPlugin(), bytecodePlugin()],
+		// El preload corre en el renderer; su V8 rechaza el bytecode generado
+		// con Electron >= 45 (cachedDataRejected), por eso va sin bytecode.
+		plugins: [externalizeDepsPlugin()],
 	},
 	renderer: {
 		build: {
