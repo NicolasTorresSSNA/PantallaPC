@@ -37,7 +37,11 @@ async function createViewer() {
 		publicKey,
 		id: fingerprintOfPublicKey(publicKey),
 		async sign(message: Buffer): Promise<string> {
-			const sig = await crypto.subtle.sign('Ed25519', keyPair.privateKey, message);
+			const sig = await crypto.subtle.sign(
+				'Ed25519',
+				keyPair.privateKey,
+				new Uint8Array(message),
+			);
 			return Buffer.from(sig).toString('base64url');
 		},
 	};
