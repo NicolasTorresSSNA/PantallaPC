@@ -190,18 +190,39 @@ const DeskreenStepper = ({
 			setIsAllowDeviceAlertOpen(true);
 		};
 
+		// Dispositivo de confianza: el main ya marco la sesion como conectada.
+		const handleDeviceAutoAllowed = (_: unknown, device: Device): void => {
+			setPendingConnectionDevice(device);
+			setIsAllowDeviceAlertOpen(false);
+			setIsUserAllowedConnection(true);
+			handleNext();
+		};
+
 		window.electron.ipcRenderer.on(
 			IpcEvents.SetPendingConnectionDevice,
 			handlePendingConnectionDevice,
 		);
+		window.electron.ipcRenderer.on(
+			IpcEvents.DeviceAutoAllowed,
+			handleDeviceAutoAllowed,
+		);
 
 		return () => {
+			window.electron.ipcRenderer.removeListener(
+				IpcEvents.DeviceAutoAllowed,
+				handleDeviceAutoAllowed,
+			);
 			window.electron.ipcRenderer.removeListener(
 				IpcEvents.SetPendingConnectionDevice,
 				handlePendingConnectionDevice,
 			);
 		};
-	}, [setIsAllowDeviceAlertOpen, setPendingConnectionDevice]);
+	}, [
+		setIsAllowDeviceAlertOpen,
+		setPendingConnectionDevice,
+		setIsUserAllowedConnection,
+		handleNext,
+	]);
 
 	const handleUserClickedDeviceDisconnectButton =
 		useCallback(async (): Promise<void> => {

@@ -30,7 +30,8 @@
     "build:mac:x64": "npm run buildClientViewer && electron-vite build && electron-builder --mac --x64",
     "build:linux": "npm run buildClientViewer && electron-vite build && electron-builder --linux",
     "build:linux:arm64": "npm run buildClientViewer && electron-vite build && electron-builder --linux --arm64",
-    "build:linux:armv7l": "npm run buildClientViewer && electron-vite build && electron-builder --linux --armv7l"
+    "build:linux:armv7l": "npm run buildClientViewer && electron-vite build && electron-builder --linux --armv7l",
+    "test": "vitest run"
   },
   "dependencies": {
     "@blueprintjs/core": "^6.3.4",
@@ -101,7 +102,8 @@
     "react-dom": "^19.2.0",
     "react-i18next": "^15.7.4",
     "typescript": "^5.9.3",
-    "vite": "^7.3.7"
+    "vite": "^7.3.7",
+    "vitest": "^3.2.7"
   },
   "packageManager": "npm@10.9.0"
 }

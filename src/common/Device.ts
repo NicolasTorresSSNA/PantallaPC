@@ -8,4 +8,6 @@ export interface Device {
 	deviceScreenWidth: number;
 	deviceScreenHeight: number;
 	deviceRoomId: string;
+	/** Socket del visor; lo estampa el servidor, no el cliente. */
+	deviceSocketId?: string;
 }

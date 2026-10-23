@@ -9,6 +9,7 @@ import Io from 'socket.io';
 import socketsIPService from './socketsIPService';
 import getStore from './store';
 import socketIOServerStore from './store/socketIOServerStore';
+import { getDeskreenGlobal } from '../main/helpers/getDeskreenGlobal';
 
 const LOCALHOST_SOCKET_IP = '127.0.0.1';
 
@@ -104,6 +105,8 @@ export default class Socket implements SocketOPTS {
 		this.socket.on('PING', (acknowledgeFunction) => {
 			acknowledgeFunction('PONG');
 		});
+
+		this.registerTrustedDeviceHandlers();
 
 		this.socket.on('MESSAGE', (payload) => {
 			payload.fromSocketID = this.socket.id;
@@ -203,7 +206,82 @@ export default class Socket implements SocketOPTS {
 		});
 	}
 
+	/**
+	 * Reconexion sin dialogo: el visor ya emparejado firma un desafio.
+	 * Solo para visores remotos; el owner (localhost) nunca se autentica asi.
+	 */
+	private registerTrustedDeviceHandlers(): void {
+		const trusted = () => getDeskreenGlobal().trustedDevicesService;
+		const limitKey = () =>
+			socketsIPService.getSocketIPByID(this.socket.id) ||
+			this.socket.request.socket.remoteAddress ||
+			this.socket.id;
+
+		this.socket.on('AUTH_HELLO', (payload) => {
+			if (isLocalhostSocket(this.socket) || typeof payload?.deviceId !== 'string') {
+				return;
+			}
+			const result = trusted().issueChallenge({
+				deviceId: payload.deviceId,
+				roomId: this.roomIdOriginal,
+				socketId: this.socket.id,
+				limitKey: limitKey(),
+			});
+			if (result.ok) {
+				this.socket.emit('AUTH_CHALLENGE', result.challenge);
+			} else {
+				this.socket.emit('AUTH_RESULT', { ok: false, reason: result.reason });
+			}
+		});
+
+		this.socket.on('AUTH_RESPONSE', (payload) => {
+			if (
+				isLocalhostSocket(this.socket) ||
+				typeof payload?.challengeId !== 'string' ||
+				typeof payload?.signature !== 'string'
+			) {
+				return;
+			}
+			const result = trusted().verifyResponse({
+				socketId: this.socket.id,
+				challengeId: payload.challengeId,
+				signature: payload.signature,
+				limitKey: limitKey(),
+			});
+			this.socket.emit(
+				'AUTH_RESULT',
+				result.ok ? { ok: true } : { ok: false, reason: result.reason },
+			);
+		});
+
+		this.socket.on('PAIR_REQUEST', (payload) => {
+			if (
+				isLocalhostSocket(this.socket) ||
+				typeof payload?.publicKey !== 'string' ||
+				typeof payload?.name !== 'string'
+			) {
+				return;
+			}
+			const pairing = trusted().startPairing({
+				socketId: this.socket.id,
+				roomId: this.roomIdOriginal,
+				publicKey: payload.publicKey,
+				name: payload.name,
+				limitKey: limitKey(),
+			});
+			if (pairing) {
+				this.socket.emit('PAIR_PENDING', {
+					code: pairing.code,
+					pairingNonce: pairing.pairingNonce,
+				});
+			} else {
+				this.socket.emit('PAIR_REJECTED');
+			}
+		});
+	}
+
 	async handleDisconnect(socket: Io.Socket): Promise<void> {
+		getDeskreenGlobal().trustedDevicesService.clearSocket(socket.id);
 		const room: Room = (await this.fetchRoom()) as Room;
 		const isOwnerUser = !!(room.users || []).find(
 			(u) => u.socketId === socket.id && u.isOwner,

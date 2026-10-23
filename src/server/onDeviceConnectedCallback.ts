@@ -17,6 +17,26 @@ export function onDeviceConnectedCallback(device: Device): void {
 		return;
 	}
 	connectedDevicesService.setPendingConnectionDevice(device);
+
+	// Visor ya emparejado que firmo el desafio de ESTA sala: sin dialogo.
+	const { trustedDevicesService } = deskreenGlobal;
+	if (
+		device.deviceSocketId &&
+		trustedDevicesService.isSocketAuthenticated(
+			device.deviceSocketId,
+			device.deviceRoomId,
+		)
+	) {
+		sharingSessionService.waitingForConnectionSharingSession?.setStatus(
+			SharingSessionStatusEnum.CONNECTED,
+		);
+		deskreenApp.mainWindow?.webContents.send(
+			IpcEvents.DeviceAutoAllowed,
+			device,
+		);
+		return;
+	}
+
 	deskreenApp.mainWindow?.webContents.send(
 		IpcEvents.SetPendingConnectionDevice,
 		device,

@@ -1,3 +1,4 @@
+import path from 'path';
 import { app } from 'electron';
 import { ConnectedDevicesService } from '../../features/ConnectedDevicesService';
 import SharingSessionService from '../../features/SharingSessionService';
@@ -5,6 +6,8 @@ import RendererWebrtcHelpersService from '../../features/PeerConnectionHelperRen
 import RoomIDService from '../../server/RoomIDService';
 import DesktopCapturerSources from '../../features/DesktopCapturerSourcesService';
 import DesktopCapturerSourcesService from '../../features/DesktopCapturerSourcesService';
+import { TrustedDevicesService } from '../../features/TrustedDevicesService';
+import { FileTrustedDevicesStorage } from '../../features/TrustedDevicesService/fileStorage';
 
 export interface DeskreenGlobal {
 	appPath: string;
@@ -12,6 +15,7 @@ export interface DeskreenGlobal {
 	roomIDService: RoomIDService;
 	connectedDevicesService: ConnectedDevicesService;
 	sharingSessionService: SharingSessionService;
+	trustedDevicesService: TrustedDevicesService;
 	desktopCapturerSourcesService: DesktopCapturerSourcesService;
 	latestAppVersion: string;
 	currentAppVersion: string;
@@ -30,6 +34,11 @@ export const initGlobals = (appPath: string, cliLocalIp?: string) => {
 		deskreenGlobal.roomIDService,
 		deskreenGlobal.connectedDevicesService,
 		deskreenGlobal.rendererWebrtcHelpersService,
+	);
+	deskreenGlobal.trustedDevicesService = new TrustedDevicesService(
+		new FileTrustedDevicesStorage(
+			path.join(app.getPath('userData'), 'trusted-devices.json'),
+		),
 	);
 	deskreenGlobal.desktopCapturerSourcesService = new DesktopCapturerSources();
 	deskreenGlobal.latestAppVersion = '';

@@ -67,6 +67,7 @@ export function handleDeviceIPMessage(
 	deviceIP: string,
 	peerConnection: PeerConnection,
 	message: ProcessedMessage,
+	deviceSocketId?: string,
 ): void {
 	if (message.type !== 'DEVICE_DETAILS') return;
 	const device = {
@@ -79,6 +80,7 @@ export function handleDeviceIPMessage(
 		deviceScreenHeight: message.payload.deviceScreenHeight,
 		sharingSessionID: peerConnection.sharingSessionID,
 		deviceRoomId: peerConnection.roomID,
+		deviceSocketId,
 	};
 	peerConnection.partnerDeviceDetails = device;
 	peerConnection.onDeviceConnectedCallback(device);
@@ -105,7 +107,12 @@ export const handleRecieveEncryptedMessage = async (
 			payload.fromSocketID,
 			(deviceIP: string) => {
 				// TODO: need to add myIP in client message.payload.myIP, then if retrieved deviceIP and myIP from client don't match, we were spoofed, then we can interrupt connection immediately!
-				handleDeviceIPMessage(deviceIP, peerConnection, message);
+				handleDeviceIPMessage(
+					deviceIP,
+					peerConnection,
+					message,
+					payload.fromSocketID,
+				);
 			},
 		);
 	}

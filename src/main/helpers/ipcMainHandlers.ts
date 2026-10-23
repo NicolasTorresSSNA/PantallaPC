@@ -405,6 +405,35 @@ export const initIpcMainHandlers = (mainWindow: BrowserWindow): void => {
 		},
 	);
 
+	ipcMain.handle(IpcEvents.GetTrustedDevices, () => {
+		return getDeskreenGlobal().trustedDevicesService.list();
+	});
+
+	ipcMain.handle(IpcEvents.RevokeTrustedDevice, (_, deviceId: string) => {
+		return getDeskreenGlobal().trustedDevicesService.revoke(deviceId);
+	});
+
+	// Codigo de emparejamiento del visor que esta esperando el "Permitir".
+	ipcMain.handle(IpcEvents.GetPendingPairing, () => {
+		const { connectedDevicesService, trustedDevicesService } =
+			getDeskreenGlobal();
+		const socketId =
+			connectedDevicesService.pendingConnectionDevice.deviceSocketId;
+		const pairing = socketId
+			? trustedDevicesService.getPendingPairing(socketId)
+			: null;
+		return pairing ? { code: pairing.code, name: pairing.name } : null;
+	});
+
+	// Solo tras el "Permitir" explicito del usuario: recuerda el dispositivo.
+	ipcMain.handle(IpcEvents.ConfirmDevicePairing, () => {
+		const { connectedDevicesService, trustedDevicesService } =
+			getDeskreenGlobal();
+		const socketId =
+			connectedDevicesService.pendingConnectionDevice.deviceSocketId;
+		return socketId ? trustedDevicesService.confirmPairing(socketId) : null;
+	});
+
 	ipcMain.handle(IpcEvents.GetPendingConnectionDevice, () => {
 		return getDeskreenGlobal().connectedDevicesService.pendingConnectionDevice;
 	});
