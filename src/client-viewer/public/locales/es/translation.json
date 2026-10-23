@@ -79,5 +79,6 @@
 	"Enable Analytics": "Habilitar Analítica",
 	"Disable Analytics": "Deshabilitar Analítica",
 	"Click the Disable button below to stop tracking. (We'll respect this choice, but you might miss out on future improvements based on collective feedback.)": "Haz clic en el botón Deshabilitar a continuación para detener el seguimiento. (Respetaremos esta elección, pero podrías perderte mejoras futuras basadas en comentarios colectivos).",
-	"their privacy policy": "su política de privacidad"
+	"their privacy policy": "su política de privacidad",
+	"pairing-code-compare": "Código de emparejamiento: debe coincidir con el del computador"
 }

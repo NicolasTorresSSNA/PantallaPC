@@ -12,6 +12,7 @@ import { ConnectedDevicesService } from '../../features/ConnectedDevicesService'
 import SharingSession from '../../features/SharingSessionService/SharingSession';
 import RoomIDService from '../../server/RoomIDService';
 import { signalingServer } from '../../server';
+import socketIOServerStore from '../../server/store/socketIOServerStore';
 import { onDeviceConnectedCallback } from '../../server/onDeviceConnectedCallback';
 import SharingSessionStatusEnum from '../../features/SharingSessionService/SharingSessionStatusEnum';
 import getMyLocalIpV4 from './getMyLocalIpV4';
@@ -431,7 +432,16 @@ export const initIpcMainHandlers = (mainWindow: BrowserWindow): void => {
 			getDeskreenGlobal();
 		const socketId =
 			connectedDevicesService.pendingConnectionDevice.deviceSocketId;
-		return socketId ? trustedDevicesService.confirmPairing(socketId) : null;
+		const device = socketId
+			? trustedDevicesService.confirmPairing(socketId)
+			: null;
+		if (device && socketId) {
+			socketIOServerStore
+				.getServer()
+				.to(socketId)
+				.emit('PAIR_CONFIRMED', { deviceId: device.id });
+		}
+		return device;
 	});
 
 	ipcMain.handle(IpcEvents.GetPendingConnectionDevice, () => {

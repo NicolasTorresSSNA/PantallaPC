@@ -11,6 +11,7 @@ interface ConnectionPropmptsProps {
 	myDeviceDetails: DeviceDetails;
 	isShownTextPrompt: boolean;
 	promptStep: number;
+	pairingCode?: string | null;
 	connectionIconType: ConnectionIconType;
 	isShownSpinnerIcon: boolean;
 	spinnerIconType: LoadingSharingIconType;
@@ -49,6 +50,7 @@ function ConnectionPropmpts(props: ConnectionPropmptsProps) {
 	const {
 		myDeviceDetails,
 		promptStep,
+		pairingCode,
 		connectionIconType,
 		isShownSpinnerIcon,
 		spinnerIconType,
@@ -117,6 +119,12 @@ function ConnectionPropmpts(props: ConnectionPropmptsProps) {
 							<div id="prompt-text" style={{ fontSize: '20px' }}>
 								{getPromptContent(t, promptStep)}
 							</div>
+							{pairingCode && promptStep === 1 && (
+								<div id="pairing-code" style={{ marginTop: '12px' }}>
+									<div>{t('pairing-code-compare') as string}</div>
+									<H3 style={{ letterSpacing: '4px' }}>{pairingCode}</H3>
+								</div>
+							)}
 							<Row center="xs" style={{ marginTop: '20px' }}>
 								<Button
 									className="rounded-pill-button"

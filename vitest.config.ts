@@ -4,6 +4,6 @@ export default defineConfig({
 	test: {
 		environment: 'node',
 		include: ['src/**/*.test.ts'],
-		exclude: ['src/client-viewer/**', 'node_modules/**'],
+		exclude: ['src/client-viewer/node_modules/**', 'src/client-viewer/dist/**', 'node_modules/**'],
 	},
 });

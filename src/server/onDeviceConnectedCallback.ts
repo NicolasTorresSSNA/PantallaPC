@@ -27,9 +27,15 @@ export function onDeviceConnectedCallback(device: Device): void {
 			device.deviceRoomId,
 		)
 	) {
-		sharingSessionService.waitingForConnectionSharingSession?.setStatus(
-			SharingSessionStatusEnum.CONNECTED,
-		);
+		const waitingSession =
+			sharingSessionService.waitingForConnectionSharingSession;
+		// El visor puede reenviar sus detalles: auto-permitir solo una vez por sesion.
+		if (
+			waitingSession && waitingSession.status !== SharingSessionStatusEnum.NOT_CONNECTED
+		) {
+			return;
+		}
+		waitingSession?.setStatus(SharingSessionStatusEnum.CONNECTED);
 		deskreenApp.mainWindow?.webContents.send(
 			IpcEvents.DeviceAutoAllowed,
 			device,

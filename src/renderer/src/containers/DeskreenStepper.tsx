@@ -154,8 +154,15 @@ const DeskreenStepper = ({
 		setActiveStep((prevActiveStep: number) => prevActiveStep - 1);
 	}, [setActiveStep]);
 
+	const [pairing, setPairing] = useState<{ code: string; name: string } | null>(
+		null,
+	);
+	const [rememberDevice, setRememberDevice] = useState(false);
+
 	const handleCancelAlert = async (): Promise<void> => {
 		setIsAllowDeviceAlertOpen(false);
+		setPairing(null);
+		setRememberDevice(false);
 		setActiveStep(0);
 		setPendingConnectionDevice(null);
 		setIsUserAllowedConnection(false);
@@ -172,10 +179,24 @@ const DeskreenStepper = ({
 		setIsAllowDeviceAlertOpen(false);
 		setIsUserAllowedConnection(true);
 		handleNext();
+		// Solo con la casilla marcada Y el "Permitir" explicito se recuerda el visor.
+		if (rememberDevice && pairing) {
+			await window.electron.ipcRenderer.invoke(
+				IpcEvents.ConfirmDevicePairing,
+			);
+		}
+		setPairing(null);
+		setRememberDevice(false);
 		await window.electron.ipcRenderer.invoke(
 			IpcEvents.SetDeviceConnectedStatus,
 		);
-	}, [handleNext, setIsAllowDeviceAlertOpen, setIsUserAllowedConnection]);
+	}, [
+		handleNext,
+		setIsAllowDeviceAlertOpen,
+		setIsUserAllowedConnection,
+		rememberDevice,
+		pairing,
+	]);
 
 	useEffect(() => {
 		window.electron.ipcRenderer.invoke(
@@ -187,6 +208,11 @@ const DeskreenStepper = ({
 			device: Device,
 		): void => {
 			setPendingConnectionDevice(device);
+			setRememberDevice(false);
+			window.electron.ipcRenderer
+				.invoke(IpcEvents.GetPendingPairing)
+				.then((p: { code: string; name: string } | null) => setPairing(p))
+				.catch(() => setPairing(null));
 			setIsAllowDeviceAlertOpen(true);
 		};
 
@@ -195,7 +221,8 @@ const DeskreenStepper = ({
 			setPendingConnectionDevice(device);
 			setIsAllowDeviceAlertOpen(false);
 			setIsUserAllowedConnection(true);
-			handleNext();
+			// Idempotente: pasa a "Seleccionar" sin saltarse pasos si el evento se repite.
+			setActiveStep((prev: number) => (prev < 1 ? 1 : prev));
 		};
 
 		window.electron.ipcRenderer.on(
@@ -221,7 +248,7 @@ const DeskreenStepper = ({
 		setIsAllowDeviceAlertOpen,
 		setPendingConnectionDevice,
 		setIsUserAllowedConnection,
-		handleNext,
+		setActiveStep,
 	]);
 
 	const handleUserClickedDeviceDisconnectButton =
@@ -324,6 +351,9 @@ const DeskreenStepper = ({
 					isOpen={isAllowDeviceAlertOpen}
 					onCancel={handleCancelAlert}
 					onConfirm={handleConfirmAlert}
+					pairing={pairing}
+					rememberDevice={rememberDevice}
+					onRememberDeviceChange={setRememberDevice}
 				/>
 			</>
 			<Dialog isOpen={isNoWiFiError} autoFocus usePortal>

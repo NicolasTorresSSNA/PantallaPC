@@ -29,6 +29,7 @@ function MainView() {
 	const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
 
 	const [promptStep, setPromptStep] = useState(1);
+	const [pairingCode, setPairingCode] = useState<string | null>(null);
 	const [dialogErrorMessage, setDialogErrorMessage] =
 		useState<ErrorMessageType>(ErrorMessage.UNKNOWN_ERROR);
 	const [connectionIconType, setConnectionIconType] =
@@ -88,6 +89,7 @@ function MainView() {
 			setIsErrorDialogOpen,
 			setUrl,
 			setPeer,
+			setPairingCode,
 		}),
 		[connectionRoomId],
 	);
@@ -123,6 +125,7 @@ function MainView() {
 				myDeviceDetails={myDeviceDetails}
 				isShownTextPrompt={isShownTextPrompt}
 				promptStep={promptStep}
+				pairingCode={pairingCode}
 				connectionIconType={connectionIconType}
 				spinnerIconType={loadingSharingIconType}
 				isShownSpinnerIcon={isShownLoadingSharingIcon}

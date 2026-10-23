@@ -16,6 +16,8 @@ export default class PeerConnectionUIHandler {
 
 	setIsErrorDialogOpen: (val: boolean) => void;
 
+	setPairingCodeCallback: (code: string | null) => void;
+
 	errorDialogMessage: ErrorMessageType = ErrorMessage.UNKNOWN_ERROR;
 
 	constructor(
@@ -25,6 +27,7 @@ export default class PeerConnectionUIHandler {
 		setAppLanguageCallback: (newLang: string) => void,
 		setDialogErrorMessageCallback: (message: ErrorMessageType) => void,
 		setIsErrorDialogOpen: (val: boolean) => void,
+		setPairingCodeCallback: (code: string | null) => void = () => {},
 	) {
 		this.hostAllowedToConnectCallback = hostAllowedToConnectCallback;
 		this.setMyDeviceDetails = setMyDeviceDetails;
@@ -33,5 +36,6 @@ export default class PeerConnectionUIHandler {
 		this.setAppLanguageCallback = setAppLanguageCallback;
 		this.setDialogErrorMessageCallback = setDialogErrorMessageCallback;
 		this.setIsErrorDialogOpen = setIsErrorDialogOpen;
+		this.setPairingCodeCallback = setPairingCodeCallback;
 	}
 }

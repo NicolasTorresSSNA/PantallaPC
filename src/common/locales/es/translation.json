@@ -169,5 +169,8 @@
 	"screen-recording-permission-message": "Deskreen requiere permiso de grabación de pantalla para compartir su pantalla. Por favor, vaya a Configuración del Sistema > Privacidad y seguridad > Grabación de pantalla y habilite el acceso para Deskreen. Es posible que necesite reiniciar la aplicación después de otorgar el permiso.",
 	"screen-recording-permission-restart-reminder": "Debe reiniciar la aplicación después de otorgar el permiso de grabación de pantalla para que surta efecto.",
 	"screen-recording-permission-open-settings": "Abrir Configuración del Sistema",
-	"screen-recording-permission-restart-app": "Reiniciar aplicación"
+	"screen-recording-permission-restart-app": "Reiniciar aplicación",
+	"pairing-code-compare": "Código de emparejamiento: debe coincidir con el del computador",
+	"remember-this-device": "Recordar este dispositivo",
+	"remember-this-device-hint": "No pedir permiso la próxima vez"
 }

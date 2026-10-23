@@ -6,6 +6,8 @@ import {
 } from '../../utils/userAgentParserHelpers';
 import PeerConnectionSocketNotDefined from './errors/PeerConnectionSocketNotDefined';
 import setAndShowErrorDialogMessage from './setAndShowErrorDialogMessage';
+import { runTrustHandshake } from '../TrustedDevice/trustHandshake';
+import { indexedDbStore } from '../TrustedDevice/idbStore';
 
 export function getMyIPCallback(
 	peerConnection: PeerConnection,
@@ -25,7 +27,24 @@ export function getMyIPCallback(
 		peerConnection.uaParser,
 	);
 
-	peerConnection.initApp(peerConnection.user, ip);
+	// Reconocimiento de dispositivo de confianza ANTES de entrar a la sala; si
+	// algo falla, se sigue con el flujo normal (dialogo "Permitir" en el desktop).
+	const { socket } = peerConnection;
+	const proceed = () => peerConnection.initApp(peerConnection.user, ip);
+	if (!socket) {
+		proceed();
+		return;
+	}
+	runTrustHandshake({
+		socket,
+		roomId: peerConnection.roomId,
+		store: indexedDbStore,
+		deviceName: `${peerConnection.myDeviceDetails.myBrowser} ${peerConnection.myDeviceDetails.myOS}`,
+		onPairingCode: (code) => peerConnection.UIHandler.setPairingCodeCallback(code),
+		onPaired: () => peerConnection.UIHandler.setPairingCodeCallback(null),
+	})
+		.catch(() => undefined)
+		.finally(proceed);
 }
 
 export default (peerConnection: PeerConnection) => {

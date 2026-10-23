@@ -1,4 +1,12 @@
 import crypto from 'crypto';
+import {
+	SIGNATURE_DOMAIN,
+	buildPairingCodeInput,
+	buildSignedMessageText,
+	pairingCodeFromDigest,
+} from '../../common/trustProtocol';
+
+export { SIGNATURE_DOMAIN };
 
 /**
  * Dispositivos de confianza: el visor (celular) guarda una clave privada
@@ -8,7 +16,6 @@ import crypto from 'crypto';
  * Esta clase es pura (sin Electron): la persistencia y el reloj se inyectan.
  */
 
-export const SIGNATURE_DOMAIN = 'deskreen-trust-v1';
 const CHALLENGE_TTL_MS = 30_000;
 const PAIRING_TTL_MS = 5 * 60_000;
 const DEFAULT_DEVICE_TTL_MS = 30 * 24 * 60 * 60_000;
@@ -103,27 +110,24 @@ function toPublicKeyObject(publicKey: string): crypto.KeyObject | null {
 	}
 }
 
-/** Mensaje exacto que firma el visor. Ata la firma al dispositivo, sala y desafio. */
+/** Mensaje exacto que firma el visor (formato compartido en common/trustProtocol). */
 export function buildSignedMessage(params: {
 	deviceId: string;
 	roomId: string;
 	challengeId: string;
 	nonce: string;
 }): Buffer {
-	const { deviceId, roomId, challengeId, nonce } = params;
-	return Buffer.from(
-		[SIGNATURE_DOMAIN, deviceId, roomId, challengeId, nonce].join('\n'),
-		'utf8',
-	);
+	return Buffer.from(buildSignedMessageText(params), 'utf8');
 }
 
 /** Codigo comparable (6 digitos) derivado de la clave publica y el nonce de emparejamiento. */
 export function pairingCode(publicKey: string, pairingNonce: string): string {
-	const digest = crypto
-		.createHash('sha256')
-		.update(`${SIGNATURE_DOMAIN}-pair\n${publicKey}\n${pairingNonce}`)
-		.digest();
-	return String(digest.readUInt32BE(0) % 1_000_000).padStart(6, '0');
+	return pairingCodeFromDigest(
+		crypto
+			.createHash('sha256')
+			.update(buildPairingCodeInput(publicKey, pairingNonce))
+			.digest(),
+	);
 }
 
 export class TrustedDevicesService {
