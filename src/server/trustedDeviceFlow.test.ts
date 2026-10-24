@@ -244,6 +244,55 @@ describe('flujo completo visor <-> servidor', () => {
 		expect(result.state).toBe('unavailable');
 	});
 
+	it('un almacenamiento que nunca responde no deja colgado al visor', async () => {
+		const hanging: KeyValueStore = {
+			get: () => new Promise(() => {}),
+			set: () => new Promise(() => {}),
+			remove: () => new Promise(() => {}),
+		};
+		const stages: string[] = [];
+		const loop = createLoopback('colgado');
+		const started = Date.now();
+		const result = await runTrustHandshake({
+			socket: loop.client,
+			roomId: ROOM,
+			store: hanging,
+			deviceName: 'x',
+			timeoutMs: 40,
+			onStage: (s) => stages.push(s),
+		});
+		expect(result.state).toBe('unavailable');
+		expect(Date.now() - started).toBeLessThan(500);
+		expect(stages).toContain('identity-loading');
+		expect(stages).toContain('deadline');
+	});
+
+	it('informa las etapas del apretón de manos (para el diagnostico)', async () => {
+		const stages: string[] = [];
+		const loop = createLoopback('etapas');
+		registerTrustedDeviceHandlers({
+			socket: loop.server,
+			service,
+			roomId: ROOM,
+			isOwnerSocket: () => false,
+			limitKey: () => IP,
+		});
+		await runTrustHandshake({
+			socket: loop.client,
+			roomId: ROOM,
+			store: kv,
+			deviceName: 'x',
+			timeoutMs: 80,
+			onStage: (s) => stages.push(s),
+		});
+		expect(stages).toEqual([
+			'identity-loading',
+			'identity-ready',
+			'pair-request',
+			'pair-pending',
+		]);
+	});
+
 	it('el owner (localhost) no se autentica por este camino', async () => {
 		await pairOnce();
 		const owner = connect({ owner: true });

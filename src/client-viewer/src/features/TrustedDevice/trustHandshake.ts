@@ -40,6 +40,8 @@ export interface TrustHandshakeOptions {
 	onPairingCode?: (code: string) => void;
 	/** Se llama cuando el desktop confirma que recordara este dispositivo. */
 	onPaired?: () => void;
+	/** Para diagnostico: nombre de la etapa alcanzada (sin datos sensibles). */
+	onStage?: (stage: string) => void;
 	timeoutMs?: number;
 }
 
@@ -74,11 +76,29 @@ function waitForAny<T>(
 export async function runTrustHandshake(
 	opts: TrustHandshakeOptions,
 ): Promise<TrustHandshakeResult> {
-	const { socket, roomId, store, deviceName, onPairingCode, onPaired } = opts;
 	const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+	// Tope global: pase lo que pase (almacenamiento colgado, red lenta, etc.) el
+	// visor sigue con el flujo normal en poco tiempo; nunca se queda esperando.
+	const deadline = new Promise<TrustHandshakeResult>((resolve) => {
+		setTimeout(() => {
+			opts.onStage?.('deadline');
+			resolve({ state: 'unavailable' });
+		}, timeoutMs * 2);
+	});
+	return Promise.race([runHandshakeSteps(opts, timeoutMs), deadline]);
+}
+
+async function runHandshakeSteps(
+	opts: TrustHandshakeOptions,
+	timeoutMs: number,
+): Promise<TrustHandshakeResult> {
+	const { socket, roomId, store, deviceName, onPairingCode, onPaired } = opts;
+	const stage = (name: string) => opts.onStage?.(name);
 
 	try {
+		stage('identity-loading');
 		let identity = await loadOrCreateIdentity(store);
+		stage('identity-ready');
 
 		socket.on('PAIR_CONFIRMED', async (msg: PairConfirmedMessage) => {
 			if (typeof msg?.deviceId !== 'string') return;
@@ -93,6 +113,7 @@ export async function runTrustHandshake(
 
 		if (identity.pairedDeviceId) {
 			const deviceId = identity.pairedDeviceId;
+			stage('auth-hello');
 			socket.emit('AUTH_HELLO', { deviceId });
 			const first = await waitForAny<AuthChallengeMessage | AuthResultMessage>(
 				socket,
@@ -135,6 +156,7 @@ export async function runTrustHandshake(
 			await saveIdentity(store, identity);
 		}
 
+		stage('pair-request');
 		socket.emit('PAIR_REQUEST', {
 			publicKey: identity.publicKey,
 			name: deviceName,
@@ -151,9 +173,11 @@ export async function runTrustHandshake(
 			identity.publicKey,
 			pairing.data.pairingNonce,
 		);
+		stage('pair-pending');
 		onPairingCode?.(code);
 		return { state: 'pairing', pairingCode: code };
 	} catch {
+		stage('error');
 		return { state: 'unavailable' };
 	}
 }

@@ -3,6 +3,7 @@ import { Col, Row } from 'react-flexbox-grid';
 import { useTranslation } from 'react-i18next';
 import './index.css';
 import { type ErrorMessageType } from './ErrorMessageEnum';
+import { getDiag } from '../../utils/diagnostics';
 
 interface ErrorDialogProps {
 	isOpen: boolean;
@@ -61,6 +62,9 @@ function ErrorDialog(props: ErrorDialogProps) {
 				<H3 className={Classes.TEXT_MUTED}>{t(`${errorMessage}`)}</H3>
 				<Divider />
 				<H2>{`${t('You may close this browser window then try to connect again')}.`}</H2>
+				<p id="connection-diagnostics" style={{ fontSize: '12px', opacity: 0.7, wordBreak: 'break-word' }}>
+					{isOpen ? getDiag() : ''}
+				</p>
 			</div>
 		</Dialog>
 	);

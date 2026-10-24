@@ -8,6 +8,7 @@ import PeerConnectionSocketNotDefined from './errors/PeerConnectionSocketNotDefi
 import setAndShowErrorDialogMessage from './setAndShowErrorDialogMessage';
 import { runTrustHandshake } from '../TrustedDevice/trustHandshake';
 import { indexedDbStore } from '../TrustedDevice/idbStore';
+import { diag } from '../../utils/diagnostics';
 
 export function getMyIPCallback(
 	peerConnection: PeerConnection,
@@ -30,7 +31,11 @@ export function getMyIPCallback(
 	// Reconocimiento de dispositivo de confianza ANTES de entrar a la sala; si
 	// algo falla, se sigue con el flujo normal (dialogo "Permitir" en el desktop).
 	const { socket } = peerConnection;
-	const proceed = () => peerConnection.initApp(peerConnection.user, ip);
+	diag('GET_MY_IP ok');
+	const proceed = () => {
+		diag('USER_ENTER');
+		peerConnection.initApp(peerConnection.user, ip);
+	};
 	if (!socket) {
 		proceed();
 		return;
@@ -40,6 +45,7 @@ export function getMyIPCallback(
 		roomId: peerConnection.roomId,
 		store: indexedDbStore,
 		deviceName: `${peerConnection.myDeviceDetails.myBrowser} ${peerConnection.myDeviceDetails.myOS}`,
+		onStage: (stage) => diag(`trust:${stage}`),
 		onPairingCode: (code) => peerConnection.UIHandler.setPairingCodeCallback(code),
 		onPaired: () => peerConnection.UIHandler.setPairingCodeCallback(null),
 	})
@@ -56,6 +62,7 @@ export default (peerConnection: PeerConnection) => {
 	}
 
 	socket.on('disconnect', () => {
+		diag('socket disconnect');
 		disconnectCount++;
 		// handle disconnect even when stream is started - stop stream and show error
 		if (peerConnection.isStreamStarted && disconnectCount >= 1) {
@@ -70,6 +77,7 @@ export default (peerConnection: PeerConnection) => {
 	});
 
 	socket.on('connect', () => {
+		diag('socket connect');
 		let ipCallbackReceived = false;
 
 		// clear any existing reconnect timeout
@@ -105,6 +113,7 @@ export default (peerConnection: PeerConnection) => {
 	});
 
 	socket.on('NOT_ALLOWED', () => {
+		diag('NOT_ALLOWED');
 		isAllowed = false;
 		setAndShowErrorDialogMessage(peerConnection, ErrorMessage.NOT_ALLOWED);
 	});
@@ -162,6 +171,7 @@ export default (peerConnection: PeerConnection) => {
 	});
 
 	socket.on('ROOM_LOCKED', () => {
+		diag('ROOM_LOCKED');
 		setAndShowErrorDialogMessage(peerConnection, ErrorMessage.DENY_TO_CONNECT);
 	});
 };
