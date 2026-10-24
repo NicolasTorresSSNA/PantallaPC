@@ -79,13 +79,18 @@ export async function runTrustHandshake(
 	const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 	// Tope global: pase lo que pase (almacenamiento colgado, red lenta, etc.) el
 	// visor sigue con el flujo normal en poco tiempo; nunca se queda esperando.
+	let timer: ReturnType<typeof setTimeout> | undefined;
 	const deadline = new Promise<TrustHandshakeResult>((resolve) => {
-		setTimeout(() => {
+		timer = setTimeout(() => {
 			opts.onStage?.('deadline');
 			resolve({ state: 'unavailable' });
 		}, timeoutMs * 2);
 	});
-	return Promise.race([runHandshakeSteps(opts, timeoutMs), deadline]);
+	try {
+		return await Promise.race([runHandshakeSteps(opts, timeoutMs), deadline]);
+	} finally {
+		clearTimeout(timer);
+	}
 }
 
 async function runHandshakeSteps(

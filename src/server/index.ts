@@ -33,6 +33,9 @@ const getRoomIdHash = (id: string): string => {
 const ioHandleOnConnection = (socket): void => {
 	const { roomId } = socket.handshake.query;
 	const store = getStore();
+	console.info(
+		`[signaling] connect ip=${socket.request.socket.remoteAddress} room=${String(roomId).slice(0, 2)}****`,
+	);
 
 	setTimeout(async () => {
 		if (!getDeskreenGlobal().roomIDService.isRoomIDTaken(roomId)) {

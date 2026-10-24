@@ -3,7 +3,7 @@
  * error y poder saber en que paso se quedo el visor. No guarda datos sensibles
  * (ni claves, ni codigos, ni el id de sala).
  */
-const MAX_ENTRIES = 14;
+const MAX_ENTRIES = 30;
 const startedAt = Date.now();
 const entries: string[] = [];
 

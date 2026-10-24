@@ -14,6 +14,8 @@ import { registerTrustedDeviceHandlers } from './trustedDeviceSocketHandlers';
 
 const LOCALHOST_SOCKET_IP = '127.0.0.1';
 
+const maskRoom = (roomId: string): string => `${roomId.slice(0, 2)}****`;
+
 interface SocketOPTS {
 	roomId: string;
 	socket: Io.Socket;
@@ -130,6 +132,9 @@ export default class Socket implements SocketOPTS {
 
 		this.socket.on('USER_ENTER', async (payload) => {
 			let room: Room = (await this.fetchRoom()) as Room;
+			console.info(
+				`[signaling] USER_ENTER room=${maskRoom(this.roomIdOriginal)} owner=${isLocalhostSocket(this.socket)} usersInRoom=${(room.users || []).length}`,
+			);
 			if (_.isEmpty(room)) {
 				room = {
 					id: this.roomId,
@@ -150,6 +155,9 @@ export default class Socket implements SocketOPTS {
 					return !user.isOwner;
 				});
 				if (connectedViewers.length >= 1) {
+					console.warn(
+						`[signaling] NOT_ALLOWED room=${maskRoom(this.roomIdOriginal)}: ya hay ${connectedViewers.length} visor(es)`,
+					);
 					this.socket.emit('NOT_ALLOWED');
 					setTimeout(() => {
 						this.socket.disconnect(true);
@@ -172,6 +180,9 @@ export default class Socket implements SocketOPTS {
 			};
 			await this.saveRoom(newRoom);
 
+			console.info(
+				`[signaling] broadcast USER_ENTER room=${maskRoom(this.roomIdOriginal)} users=${newRoom.users.length}`,
+			);
 			socketIOServerStore
 				.getServer()
 				.to(this.roomId)

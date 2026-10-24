@@ -61,6 +61,10 @@ export default (peerConnection: PeerConnection) => {
 		throw new PeerConnectionSocketNotDefined();
 	}
 
+	// Solo nombres de eventos (sin contenido) para diagnosticar donde se detiene.
+	socket.onAny((event: string) => diag(`<${event}`));
+	socket.onAnyOutgoing((event: string) => diag(`>${event}`));
+
 	socket.on('disconnect', () => {
 		diag('socket disconnect');
 		disconnectCount++;
@@ -119,6 +123,7 @@ export default (peerConnection: PeerConnection) => {
 	});
 
 	socket.on('USER_ENTER', (payload: { users: PartnerPeerUser[] }) => {
+		diag(`USER_ENTER users=${payload?.users?.length ?? 'n/a'}`);
 		if (!isAllowed) return;
 		const filteredPartner = payload.users.filter((v) => {
 			return peerConnection.user.username !== v.username;
