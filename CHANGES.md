@@ -6,7 +6,7 @@ Este documento cumple el aviso de modificación de la sección 5(a) de la AGPL-3
   commit `b5dc3d4` (8 de julio de 2026), © Pavlo Buidenkov y colaboradores, AGPL-3.0.
 - **Modificaciones:** Nicolas Torres, **23 y 24 de octubre de 2026**, con asistencia de
   Claude (Anthropic). Cada cambio es un commit de este repositorio posterior a `b5dc3d4`;
-  `git log b5dc3d4..main` los lista y `git diff b5dc3d4 main` muestra el diff completo
+  `git log b5dc3d4..master` los lista y `git diff b5dc3d4 master` muestra el diff completo
   (67 archivos, sin contar los `package-lock.json`).
 - No se modificó el texto de la licencia ([LICENSE](LICENSE)).
 
