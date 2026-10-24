@@ -16,9 +16,22 @@ export const MIGRATABLE_FILES = [
 	'trusted-devices.json',
 ] as const;
 
+export const STANDARD_DIR_NAME = 'PantallaPC';
+export const UNINSTALLER_NAME = 'Uninstall PantallaPC.exe';
+
 export interface DataDirOptions {
 	isPackaged: boolean;
 	execPath: string;
+	/**
+	 * La app fue instalada con el instalador (hay desinstalador junto al .exe).
+	 * Borrar la carpeta de instalacion borraria los datos, asi que se usa la
+	 * carpeta estandar de Windows (%APPDATA%).
+	 */
+	hasUninstaller?: boolean;
+	/** Se puede escribir junto al ejecutable (falso en Archivos de programa). */
+	isExeDirWritable?: boolean;
+	/** %APPDATA% (carpeta estandar de datos de usuario en Windows). */
+	appDataDir?: string;
 	/** Definida por el modo "portable" de electron-builder (carpeta del .exe real). */
 	portableExecutableDir?: string;
 	/** Forzar una carpeta concreta (pruebas, o quien quiera otro sitio). */
@@ -26,12 +39,19 @@ export interface DataDirOptions {
 }
 
 /**
- * Carpeta de datos a usar, o null para dejar el comportamiento por defecto
- * (modo desarrollo sin empaquetar).
+ * Carpeta de datos a usar, o null para dejar la de Electron por defecto
+ * (solo desarrollo sin empaquetar). App instalada o carpeta sin permiso de
+ * escritura: %APPDATA%\PantallaPC.
  */
 export function resolveDataDir(opts: DataDirOptions): string | null {
 	if (opts.overrideDir) return path.resolve(opts.overrideDir);
 	if (!opts.isPackaged) return null;
+	if (opts.hasUninstaller || opts.isExeDirWritable === false) {
+		// Propia de PantallaPC: NO la de "deskreen-ce", que usa el Deskreen original.
+		return opts.appDataDir
+			? path.join(opts.appDataDir, STANDARD_DIR_NAME)
+			: null;
+	}
 	const baseDir = opts.portableExecutableDir || path.dirname(opts.execPath);
 	return path.join(baseDir, DATA_DIR_NAME);
 }

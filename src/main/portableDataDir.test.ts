@@ -27,6 +27,42 @@ describe('resolveDataDir', () => {
 		).toBe(path.join('D:', 'Apps', 'data'));
 	});
 
+	const appDataDir = path.join('C:', 'Users', 'u', 'AppData', 'Roaming');
+
+	it('instalada con el instalador: %APPDATA%\PantallaPC, no junto al exe ni "deskreen-ce"', () => {
+		const dir = resolveDataDir({
+			isPackaged: true,
+			execPath,
+			hasUninstaller: true,
+			appDataDir,
+		});
+		expect(dir).toBe(path.join(appDataDir, 'PantallaPC'));
+		expect(dir).not.toContain('deskreen-ce');
+	});
+
+	it('carpeta sin permiso de escritura (p. ej. Archivos de programa): usa la estandar', () => {
+		expect(
+			resolveDataDir({
+				isPackaged: true,
+				execPath,
+				isExeDirWritable: false,
+				appDataDir,
+			}),
+		).toBe(path.join(appDataDir, 'PantallaPC'));
+	});
+
+	it('la carpeta forzada gana incluso en una app instalada', () => {
+		const dir = path.join(os.tmpdir(), 'forzada');
+		expect(
+			resolveDataDir({
+				isPackaged: true,
+				execPath,
+				hasUninstaller: true,
+				overrideDir: dir,
+			}),
+		).toBe(path.resolve(dir));
+	});
+
 	it('sin empaquetar (desarrollo) no cambia nada', () => {
 		expect(resolveDataDir({ isPackaged: false, execPath })).toBeNull();
 	});

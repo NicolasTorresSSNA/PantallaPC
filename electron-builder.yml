@@ -21,7 +21,19 @@ win:
   executableName: PantallaPC
   target:
     - dir
-nsis: null
+    - nsis
+# Instalador para el usuario actual (no pide administrador). Los datos de la app
+# instalada van a %APPDATA%\PantallaPC y sobreviven a desinstalar/actualizar.
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: PantallaPC
+  artifactName: PantallaPC-Setup-${version}.${ext}
+  language: '3082'
+  deleteAppDataOnUninstall: false
 mac:
   artifactName: ${name}-${version}-${arch}.${ext}
   hardenedRuntime: true
