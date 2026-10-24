@@ -1,66 +1,33 @@
 ---
-name: Bug report
-about: You're having technical issues. 🐞 And willing to share more details. If you don't know details, write here https://github.com/pavlobu/deskreen/discussions/68
+name: Reporte de error / Bug report
+about: Algo no funciona como se espera en PantallaPC / Something does not work as expected
 labels: 'bug'
 ---
 
-<!-- Please use the following issue template or your issue will be closed -->
+> Este repositorio es un fork personal de Deskreen CE. Si el problema también ocurre
+> en el Deskreen original, repórtalo allá. / This is a personal fork of Deskreen CE;
+> if the issue also happens in the original, report it there too.
 
-## Prerequisites
+**¿Qué pasó? / What happened?**
 
-<!-- If the following boxes are not ALL checked, your issue is likely to be closed -->
+**¿Qué esperabas? / What did you expect?**
 
-- [ ] Using yarn
-- [ ] Using an up-to-date [`master` branch](https://github.com/pavlobu/deskreen/tree/master)
-- [ ] Using latest version of devtools. [Check the docs for how to update](https://electron-react-boilerplate.js.org/docs/dev-tools/)
-- [ ] For issue in production release, add devtools output of `DEBUG_PROD=true yarn build && yarn start`
-
-## Expected Behavior
-
-<!--- What should have happened? -->
-
-## Current Behavior
-
-<!--- What went wrong? -->
-
-## Steps to Reproduce
-
-<!-- Add relevant code and/or a live example -->
-<!-- Add stack traces -->
+**Pasos para reproducir / Steps to reproduce**
 
 1.
-
 2.
-
 3.
 
-4.
+**Entorno / Environment**
 
-## Possible Solution (Not obligatory)
+- Versión de PantallaPC (instalador / carpeta / código):
+- Windows (versión):
+- Navegador y sistema del dispositivo que ve la pantalla (p. ej. Chrome en Android 14):
+- ¿Usas la dirección estable `.local`? sí / no
+- ¿Es un dispositivo de confianza (emparejado)? sí / no
 
-<!--- Suggest a reason for the bug or how to fix it. -->
+**Diagnóstico**
 
-## Context
-
-<!--- How has this issue affected you? What are you trying to accomplish? -->
-<!--- Did you make any changes to the boilerplate after cloning it? -->
-<!--- Providing context helps us come up with a solution that is most useful in the real world -->
-
-## Your Environment
-
-<!--- Include as many relevant details about the environment you experienced the bug in -->
-
-- Node version :
-- Deskreen version or branch :
-- Operating System and version :
-- Link to your project :
-
-<!---
-❗️❗️ Also, please consider donating (https://opencollective.com/deskreen) ❗️❗️
-
-Donations will ensure the following:
-
-🔨 Long term maintenance of the project
-🛣 Progress on the roadmap
-🐛 Quick responses to bug reports and help requests
- -->
+Si el visor mostró un error, copia aquí la línea pequeña de diagnóstico del diálogo
+(no contiene claves ni la sala). / If the viewer showed an error dialog, paste the
+small diagnostics line at the bottom (it contains no keys or room ids).

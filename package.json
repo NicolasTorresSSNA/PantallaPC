@@ -1,10 +1,10 @@
 {
   "name": "deskreen-ce",
   "version": "3.2.16",
-  "description": "Screen sharing and present screen: Turn any device into a secondary screen for your computer",
+  "description": "PantallaPC: fork personal de Deskreen CE para transmitir la pantalla del PC a un navegador, con dispositivos de confianza (reconexion sin permisos)",
   "main": "./out/main/index.js",
   "author": "deskreen.com",
-  "homepage": "https://electron-vite.org",
+  "homepage": "https://github.com/NicolasTorresSSNA/PantallaPC",
   "scripts": {
     "clean": "rm -rf dist out src/client-viewer/dist",
     "format": "biome format --write . --max-diagnostics=none",
@@ -106,5 +106,13 @@
     "vite": "^7.3.7",
     "vitest": "^3.2.7"
   },
-  "packageManager": "npm@10.9.0"
+  "packageManager": "npm@10.9.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicolasTorresSSNA/PantallaPC.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NicolasTorresSSNA/PantallaPC/issues"
+  },
+  "license": "AGPL-3.0-only"
 }

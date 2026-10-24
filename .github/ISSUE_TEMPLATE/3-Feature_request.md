@@ -1,19 +1,11 @@
 ---
-name: Feature request
-about: You want something small added to Deskreen and with concrete code and solution. 🎉 If it is a big enhancement drop it here https://github.com/pavlobu/deskreen/discussions/50
+name: Idea o mejora / Feature request
+about: Una mejora concreta para PantallaPC / A concrete improvement for PantallaPC
 labels: 'enhancement'
 ---
 
-# Here you post only concrete examples of enhancements with code and solutions that you have. Other BIG enhancements and general ideas of features you would like to see in Deskreen, you post here: https://github.com/pavlobu/deskreen/discussions/50
+**¿Qué problema resuelve? / What problem does it solve?**
 
-# Otherwise this issue will be closed.
+**¿Cómo imaginas que funcione? / How would it work?**
 
-<!---
-❗️❗️ Also, please consider donating (https://opencollective.com/deskreen) ❗️❗️
-
-Donations will ensure the following:
-
-🔨 Long term maintenance of the project
-🛣 Progress on the roadmap
-🐛 Quick responses to bug reports and help requests
- -->
+**Alternativas consideradas / Alternatives considered**

@@ -4,9 +4,11 @@
 
   Uso:  powershell -ExecutionPolicy Bypass -File scripts\publicar-app.ps1
         (opcional) -Destino "E:\Otra\Carpeta"
+
+  Por defecto publica en una carpeta "PantallaPC-App" junto a la del repositorio.
 #>
 param(
-  [string]$Destino = "..\PantallaPC-App"
+  [string]$Destino = (Join-Path (Split-Path (Split-Path $PSScriptRoot)) "PantallaPC-App")
 )
 
 $ErrorActionPreference = "Stop"
