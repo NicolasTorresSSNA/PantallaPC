@@ -17,6 +17,7 @@ import config from '../../../../common/config';
 import { IpcEvents } from '../../../../common/IpcEvents.enum';
 import { useTranslation } from 'react-i18next';
 import Logo192 from '../../assets/logo192.png';
+import PreselectSourcePanel from './PreselectSourcePanel';
 
 const { hostname } = config;
 
@@ -334,6 +335,8 @@ const ScanQRStep: React.FC = () => {
 					<small>{t('use-stable-address-hint')}</small>
 				</Text>
 			</Row>
+
+			<PreselectSourcePanel />
 
 			<Row
 				style={{

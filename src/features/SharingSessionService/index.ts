@@ -116,7 +116,32 @@ export default class SharingSessionService {
 			this.rendererWebrtcHelpersService,
 		);
 		this.sharingSessions.set(sharingSession.id, sharingSession);
+		sharingSession.onHelperGone = () => this.handleHelperGone(sharingSession);
 		return sharingSession;
+	}
+
+	/**
+	 * La ventana auxiliar (la que "duena" la sala y habla con el visor) se cerro
+	 * o cayo sin avisar. Sin esto el PC seguiria mostrando un QR de una sala sin
+	 * dueno y el celular nunca conectaria. Se limpia y se prepara una sala nueva.
+	 */
+	handleHelperGone(session: SharingSession): void {
+		if (session.status === SharingSessionStatusEnum.DESTROYED) return;
+		const wasWaiting = this.waitingForConnectionSharingSession === session;
+		const deviceID = session.deviceID;
+
+		session.setStatus(SharingSessionStatusEnum.DESTROYED);
+		this.sharingSessions.delete(session.id);
+		this.roomIDService.unmarkRoomIDAsTaken(session.roomID);
+
+		if (wasWaiting) this.waitingForConnectionSharingSession = null;
+		if (deviceID) {
+			// Libera el cupo del visor; el listener de disponibilidad crea la sala nueva.
+			void this.connectedDevicesService.disconnectDeviceByID(deviceID);
+		}
+		if (wasWaiting) {
+			this.createWaitingForConnectionSharingSession().catch(() => undefined);
+		}
 	}
 
 	pollForInactiveSessions(): void {

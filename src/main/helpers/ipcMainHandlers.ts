@@ -17,6 +17,10 @@ import { onDeviceConnectedCallback } from '../../server/onDeviceConnectedCallbac
 import SharingSessionStatusEnum from '../../features/SharingSessionService/SharingSessionStatusEnum';
 import getMyLocalIpV4 from './getMyLocalIpV4';
 import { isStableAddressEnabled, setStableAddressEnabled } from './discovery';
+import {
+	SourcePreselection,
+	type PreselectedSource,
+} from '../../features/SourcePreselection';
 import isWifiConnected from './isWifiConnected';
 import { getDeskreenGlobal } from './getDeskreenGlobal';
 import { IpcEvents } from '../../common/IpcEvents.enum';
@@ -406,6 +410,31 @@ export const initIpcMainHandlers = (mainWindow: BrowserWindow): void => {
 			startSharingOnWaitingForConnectionSharingSession();
 		},
 	);
+
+	const sourcePreselection = new SourcePreselection(store);
+
+	ipcMain.handle(IpcEvents.GetPreselectedSource, () => {
+		return sourcePreselection.get();
+	});
+
+	ipcMain.handle(
+		IpcEvents.SetPreselectedSource,
+		(_, source: PreselectedSource | null) => {
+			return sourcePreselection.set(source);
+		},
+	);
+
+	// Devuelve el id a compartir ahora, o null si no hay seleccion o ya no existe
+	// (ventana cerrada, pantalla desconectada): en ese caso sigue el flujo normal.
+	ipcMain.handle(IpcEvents.ResolvePreselectedSource, async () => {
+		if (isLinuxWaylandSession) return null;
+		const capturer = getDeskreenGlobal().desktopCapturerSourcesService;
+		await capturer.refreshDesktopCapturerSources();
+		return sourcePreselection.resolve({
+			screens: capturer.getScreenSources().map((s) => s.id),
+			windows: capturer.getAppWindowSources().map((s) => s.id),
+		});
+	});
 
 	ipcMain.handle(IpcEvents.GetStableAddress, () => {
 		const { discoveryService } = getDeskreenGlobal();

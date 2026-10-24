@@ -23,6 +23,9 @@ export default class SharingSession {
 	peerConnectionHelperRenderer: BrowserWindow | undefined;
 	onDeviceConnectedCallback: undefined | ((device: Device) => void);
 	desktopCapturerSourceID: string;
+	/** Se invoca si la ventana auxiliar (dueno de la sala) desaparece sin que lo pidamos. */
+	onHelperGone: undefined | (() => void);
+	private destroyedIntentionally = false;
 
 	constructor(
 		_roomID: string,
@@ -45,6 +48,15 @@ export default class SharingSession {
 
 		this.peerConnectionHelperRenderer =
 			peerConnectionHelperRendererService.createPeerConnectionHelperRenderer();
+
+		const handleHelperGone = (): void => {
+			if (!this.destroyedIntentionally) this.onHelperGone?.();
+		};
+		this.peerConnectionHelperRenderer.once('closed', handleHelperGone);
+		this.peerConnectionHelperRenderer.webContents.once(
+			'render-process-gone',
+			handleHelperGone,
+		);
 
 		this.peerConnectionHelperRenderer.webContents.on('did-finish-load', () => {
 			// TODO: I need to remove dependency on renderer window, just to facilitate development
@@ -82,6 +94,7 @@ export default class SharingSession {
 	}
 
 	destroy(): void {
+		this.destroyedIntentionally = true;
 		this.peerConnectionHelperRenderer?.close();
 	}
 

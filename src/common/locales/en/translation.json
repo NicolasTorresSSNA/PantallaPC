@@ -188,5 +188,8 @@
 	"remember-this-device": "Remember this device",
 	"remember-this-device-hint": "Skip the Allow prompt next time",
 	"use-stable-address": "Use a stable address (.local)",
-	"use-stable-address-hint": "Lets your phone keep its trusted identity when your PC IP changes. If your phone cannot open the .local address, turn this off."
+	"use-stable-address-hint": "Lets your phone keep its trusted identity when your PC IP changes. If your phone cannot open the .local address, turn this off.",
+	"share-on-connect-title": "What to share when a device connects",
+	"share-on-connect-hint": "Choose it now and sharing starts as soon as you accept the device, with no extra steps.",
+	"share-on-connect-clear": "Remove selection"
 }

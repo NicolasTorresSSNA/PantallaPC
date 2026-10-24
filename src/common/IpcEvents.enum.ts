@@ -40,4 +40,7 @@ export enum IpcEvents {
 	ConfirmDevicePairing = 'confirm-device-pairing',
 	GetStableAddress = 'get-stable-address',
 	SetStableAddressEnabled = 'set-stable-address-enabled',
+	GetPreselectedSource = 'get-preselected-source',
+	SetPreselectedSource = 'set-preselected-source',
+	ResolvePreselectedSource = 'resolve-preselected-source',
 }

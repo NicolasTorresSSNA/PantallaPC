@@ -175,10 +175,28 @@ const DeskreenStepper = ({
 		);
 	};
 
+	// Si se eligio de antemano que transmitir y la fuente sigue disponible, se
+	// empieza a transmitir de inmediato (sin pasos "Seleccionar"/"Confirmar").
+	const startPreselectedSharingIfAny = useCallback(async (): Promise<boolean> => {
+		try {
+			const { ipcRenderer } = window.electron;
+			const id = await ipcRenderer.invoke(IpcEvents.ResolvePreselectedSource);
+			if (typeof id !== 'string' || id === '') return false;
+			await ipcRenderer.invoke(IpcEvents.SetDesktopCapturerSourceId, id);
+			await ipcRenderer.invoke(
+				IpcEvents.StartSharingOnWaitingForConnectionSharingSession,
+			);
+			setTimeout(() => handleReset(), 1000);
+			return true;
+		} catch (error) {
+			console.error('failed to start preselected sharing', error);
+			return false;
+		}
+	}, [handleReset]);
+
 	const handleConfirmAlert = useCallback(async () => {
 		setIsAllowDeviceAlertOpen(false);
 		setIsUserAllowedConnection(true);
-		handleNext();
 		// Solo con la casilla marcada Y el "Permitir" explicito se recuerda el visor.
 		if (rememberDevice && pairing) {
 			await window.electron.ipcRenderer.invoke(
@@ -190,8 +208,10 @@ const DeskreenStepper = ({
 		await window.electron.ipcRenderer.invoke(
 			IpcEvents.SetDeviceConnectedStatus,
 		);
+		if (!(await startPreselectedSharingIfAny())) handleNext();
 	}, [
 		handleNext,
+		startPreselectedSharingIfAny,
 		setIsAllowDeviceAlertOpen,
 		setIsUserAllowedConnection,
 		rememberDevice,
@@ -217,10 +237,14 @@ const DeskreenStepper = ({
 		};
 
 		// Dispositivo de confianza: el main ya marco la sesion como conectada.
-		const handleDeviceAutoAllowed = (_: unknown, device: Device): void => {
+		const handleDeviceAutoAllowed = async (
+			_: unknown,
+			device: Device,
+		): Promise<void> => {
 			setPendingConnectionDevice(device);
 			setIsAllowDeviceAlertOpen(false);
 			setIsUserAllowedConnection(true);
+			if (await startPreselectedSharingIfAny()) return;
 			// Idempotente: pasa a "Seleccionar" sin saltarse pasos si el evento se repite.
 			setActiveStep((prev: number) => (prev < 1 ? 1 : prev));
 		};
@@ -249,6 +273,7 @@ const DeskreenStepper = ({
 		setPendingConnectionDevice,
 		setIsUserAllowedConnection,
 		setActiveStep,
+		startPreselectedSharingIfAny,
 	]);
 
 	const handleUserClickedDeviceDisconnectButton =

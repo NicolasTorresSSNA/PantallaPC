@@ -174,5 +174,8 @@
 	"remember-this-device": "Recordar este dispositivo",
 	"remember-this-device-hint": "No pedir permiso la próxima vez",
 	"use-stable-address": "Usar dirección estable (.local)",
-	"use-stable-address-hint": "Permite que tu celular conserve su identidad de confianza aunque cambie la IP del PC. Si tu celular no abre la dirección .local, desactívala."
+	"use-stable-address-hint": "Permite que tu celular conserve su identidad de confianza aunque cambie la IP del PC. Si tu celular no abre la dirección .local, desactívala.",
+	"share-on-connect-title": "Qué transmitir al conectar un dispositivo",
+	"share-on-connect-hint": "Elígelo ahora y la transmisión empezará apenas aceptes el dispositivo, sin pasos extra.",
+	"share-on-connect-clear": "Quitar selección"
 }
