@@ -93,6 +93,10 @@ import installExtensions from './utils/installExtensions';
 import getNewVersionTag from './utils/getNewVersionTag';
 import { initIpcMainHandlers } from './helpers/ipcMainHandlers';
 import { initGlobals } from './helpers/initGlobals';
+import {
+	createDiscoveryService,
+	startDiscoveryIfEnabled,
+} from './helpers/discovery';
 import { ElectronStoreKeys } from '../common/ElectronStoreKeys.enum';
 import { getDeskreenGlobal } from './helpers/getDeskreenGlobal';
 import { startLogBufferCleanup } from './utils/LoggerWithFilePrefix';
@@ -324,7 +328,8 @@ export default class DeskreenApp {
 
 		const cliLocalIp = this.parseCliLocalIp();
 		initGlobals(join(__dirname, '..'), cliLocalIp);
-		signalingServer.start();
+		createDiscoveryService(cliLocalIp);
+		signalingServer.start().then(startDiscoveryIfEnabled);
 
 		this.initElectronAppObject();
 	}

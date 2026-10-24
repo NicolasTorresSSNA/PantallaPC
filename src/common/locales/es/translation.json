@@ -172,5 +172,7 @@
 	"screen-recording-permission-restart-app": "Reiniciar aplicación",
 	"pairing-code-compare": "Código de emparejamiento: debe coincidir con el del computador",
 	"remember-this-device": "Recordar este dispositivo",
-	"remember-this-device-hint": "No pedir permiso la próxima vez"
+	"remember-this-device-hint": "No pedir permiso la próxima vez",
+	"use-stable-address": "Usar dirección estable (.local)",
+	"use-stable-address-hint": "Permite que tu celular conserve su identidad de confianza aunque cambie la IP del PC. Si tu celular no abre la dirección .local, desactívala."
 }

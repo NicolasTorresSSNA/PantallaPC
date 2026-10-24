@@ -16,6 +16,7 @@ import socketIOServerStore from '../../server/store/socketIOServerStore';
 import { onDeviceConnectedCallback } from '../../server/onDeviceConnectedCallback';
 import SharingSessionStatusEnum from '../../features/SharingSessionService/SharingSessionStatusEnum';
 import getMyLocalIpV4 from './getMyLocalIpV4';
+import { isStableAddressEnabled, setStableAddressEnabled } from './discovery';
 import isWifiConnected from './isWifiConnected';
 import { getDeskreenGlobal } from './getDeskreenGlobal';
 import { IpcEvents } from '../../common/IpcEvents.enum';
@@ -405,6 +406,19 @@ export const initIpcMainHandlers = (mainWindow: BrowserWindow): void => {
 			startSharingOnWaitingForConnectionSharingSession();
 		},
 	);
+
+	ipcMain.handle(IpcEvents.GetStableAddress, () => {
+		const { discoveryService } = getDeskreenGlobal();
+		return {
+			enabled: isStableAddressEnabled(),
+			running: discoveryService.isRunning(),
+			hostname: discoveryService.getStableHostname(),
+		};
+	});
+
+	ipcMain.handle(IpcEvents.SetStableAddressEnabled, (_, enabled: boolean) => {
+		return setStableAddressEnabled(enabled === true);
+	});
 
 	ipcMain.handle(IpcEvents.GetTrustedDevices, () => {
 		return getDeskreenGlobal().trustedDevicesService.list();

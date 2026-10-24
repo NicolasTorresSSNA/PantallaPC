@@ -186,5 +186,7 @@
 	"screen-recording-permission-restart-app": "Restart App",
 	"pairing-code-compare": "Pairing code: it must match the one shown on your computer",
 	"remember-this-device": "Remember this device",
-	"remember-this-device-hint": "Skip the Allow prompt next time"
+	"remember-this-device-hint": "Skip the Allow prompt next time",
+	"use-stable-address": "Use a stable address (.local)",
+	"use-stable-address-hint": "Lets your phone keep its trusted identity when your PC IP changes. If your phone cannot open the .local address, turn this off."
 }

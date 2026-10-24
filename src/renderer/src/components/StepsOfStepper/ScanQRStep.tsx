@@ -7,6 +7,7 @@ import {
 	Dialog,
 	Classes,
 	H3,
+	Switch,
 } from '@blueprintjs/core';
 import { QRCodeSVG } from 'qrcode.react';
 import { makeStyles, createStyles } from '@material-ui/core';
@@ -162,12 +163,44 @@ const ScanQRStep: React.FC = () => {
 	const roomPath = useMemo(() => {
 		return roomID !== '' ? `/${roomID}` : '';
 	}, [roomID]);
+	const [stableAddress, setStableAddress] = useState<{
+		enabled: boolean;
+		running: boolean;
+		hostname: string;
+	} | null>(null);
+
+	const refreshStableAddress = (): void => {
+		window.electron.ipcRenderer
+			.invoke(IpcEvents.GetStableAddress)
+			.then(setStableAddress)
+			.catch(() => setStableAddress(null));
+	};
+
+	useEffect(() => {
+		refreshStableAddress();
+	}, []);
+
+	const handleToggleStableAddress = async (enabled: boolean): Promise<void> => {
+		await window.electron.ipcRenderer.invoke(
+			IpcEvents.SetStableAddressEnabled,
+			enabled,
+		);
+		refreshStableAddress();
+	};
+
+	// Con la direccion estable activa y anunciandose, el QR usa el nombre .local;
+	// si no, la IP de siempre (que no depende de que el celular resuelva mDNS).
+	const addressHost =
+		stableAddress?.enabled && stableAddress.running
+			? stableAddress.hostname
+			: LOCAL_LAN_IP;
+
 	const shareUrl = useMemo(() => {
 		if (!isViewerSlotAvailable) return '';
-		if (LOCAL_LAN_IP === '') return '';
+		if (addressHost === '') return '';
 		if (roomPath === '') return '';
-		return `http://${LOCAL_LAN_IP}${portString}${roomPath}`;
-	}, [LOCAL_LAN_IP, portString, roomPath, isViewerSlotAvailable]);
+		return `http://${addressHost}${portString}${roomPath}`;
+	}, [addressHost, portString, roomPath, isViewerSlotAvailable]);
 	const isQrInteractive = shareUrl !== '';
 	const connectionLimitTooltip = t('connection-limit-reached-tooltip');
 	const qrTooltipContent = isQrInteractive
@@ -275,6 +308,30 @@ const ScanQRStep: React.FC = () => {
 								'enter-the-following-address-in-browser-address-bar-on-any-device',
 							)
 						: t('one-viewing-client-is-connected-already')}
+				</Text>
+			</Row>
+
+			<Row
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					textAlign: 'center',
+					marginBottom: '10px',
+				}}
+			>
+				<Switch
+					id="stable-address-switch"
+					checked={stableAddress?.enabled === true}
+					label={t('use-stable-address')}
+					onChange={(e) =>
+						void handleToggleStableAddress(
+							(e.target as HTMLInputElement).checked,
+						)
+					}
+				/>
+				<Text className="bp3-text-muted">
+					<small>{t('use-stable-address-hint')}</small>
 				</Text>
 			</Row>
 

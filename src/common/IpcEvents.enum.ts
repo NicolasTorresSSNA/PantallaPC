@@ -38,4 +38,6 @@ export enum IpcEvents {
 	RevokeTrustedDevice = 'revoke-trusted-device',
 	GetPendingPairing = 'get-pending-pairing',
 	ConfirmDevicePairing = 'confirm-device-pairing',
+	GetStableAddress = 'get-stable-address',
+	SetStableAddressEnabled = 'set-stable-address-enabled',
 }

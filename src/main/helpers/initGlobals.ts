@@ -6,6 +6,7 @@ import RendererWebrtcHelpersService from '../../features/PeerConnectionHelperRen
 import RoomIDService from '../../server/RoomIDService';
 import DesktopCapturerSources from '../../features/DesktopCapturerSourcesService';
 import DesktopCapturerSourcesService from '../../features/DesktopCapturerSourcesService';
+import type { DiscoveryService } from '../../features/DiscoveryService';
 import { TrustedDevicesService } from '../../features/TrustedDevicesService';
 import { FileTrustedDevicesStorage } from '../../features/TrustedDevicesService/fileStorage';
 
@@ -16,6 +17,7 @@ export interface DeskreenGlobal {
 	connectedDevicesService: ConnectedDevicesService;
 	sharingSessionService: SharingSessionService;
 	trustedDevicesService: TrustedDevicesService;
+	discoveryService: DiscoveryService;
 	desktopCapturerSourcesService: DesktopCapturerSourcesService;
 	latestAppVersion: string;
 	currentAppVersion: string;
