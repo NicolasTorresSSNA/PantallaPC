@@ -51,7 +51,7 @@ export default function handleSelfDestroy(
 	peerConnection.onDeviceConnectedCallback = () => {
 		// reset callback after destruction
 	};
-	peerConnection.isCallStarted = false;
+	peerConnection.callSignalGate.reset();
 
 	window.electron.ipcRenderer.invoke(
 		IpcEvents.UnmarkRoomIDAsTaken,

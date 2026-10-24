@@ -1,3 +1,4 @@
+import CallSignalGate from './CallSignalGate';
 import { prepare as prepareMessage } from '../../utils/message';
 import { connectSocket } from '../../../../common/connectSocket';
 import handleCreatePeer from './handleCreatePeer';
@@ -43,8 +44,7 @@ export default class PeerConnection {
 		deviceScreenWidth: 0,
 		deviceScreenHeight: 0,
 	} as Device;
-	signalsDataToCallUser: string[];
-	isCallStarted: boolean;
+	callSignalGate: CallSignalGate;
 	onDeviceConnectedCallback: (device: Device) => void;
 	displayID: string;
 	sourceDisplaySize: DisplaySize | undefined;
@@ -63,8 +63,12 @@ export default class PeerConnection {
 		this.user = user;
 		this.partner = NullUser;
 		this.desktopCapturerSourceID = '';
-		this.signalsDataToCallUser = [];
-		this.isCallStarted = false;
+		this.callSignalGate = new CallSignalGate((signalData: string) => {
+			void this.sendEncryptedMessage({
+				type: 'CALL_USER',
+				payload: { signalData },
+			});
+		});
 		this.localStream = null;
 		this.displayID = '';
 		this.sourceDisplaySize = undefined;
@@ -280,19 +284,14 @@ export default class PeerConnection {
 		handleRecieveEncryptedMessage(this, payload);
 	}
 
+	get isCallStarted(): boolean {
+		return this.callSignalGate.isCallStarted();
+	}
+
+	// Seguro pedirla antes de que exista la oferta: se envia al generarse.
 	callPeer(): void {
 		if (process.env.RUN_MODE === 'test') return;
-		if (this.isCallStarted) return;
-		this.isCallStarted = true;
-
-		this.signalsDataToCallUser.forEach((data: string) => {
-			this.sendEncryptedMessage({
-				type: 'CALL_USER',
-				payload: {
-					signalData: data,
-				},
-			});
-		});
+		this.callSignalGate.requestCall();
 	}
 
 	createPeer(): Promise<void> {
