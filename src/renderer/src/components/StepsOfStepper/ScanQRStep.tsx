@@ -8,6 +8,7 @@ import {
 	Classes,
 	H3,
 	Switch,
+	Collapse,
 } from '@blueprintjs/core';
 import { QRCodeSVG } from 'qrcode.react';
 import { makeStyles, createStyles } from '@material-ui/core';
@@ -164,6 +165,7 @@ const ScanQRStep: React.FC = () => {
 	const roomPath = useMemo(() => {
 		return roomID !== '' ? `/${roomID}` : '';
 	}, [roomID]);
+	const [areOptionsOpen, setAreOptionsOpen] = useState(false);
 	const [stableAddress, setStableAddress] = useState<{
 		enabled: boolean;
 		running: boolean;
@@ -321,22 +323,34 @@ const ScanQRStep: React.FC = () => {
 					marginBottom: '10px',
 				}}
 			>
-				<Switch
-					id="stable-address-switch"
-					checked={stableAddress?.enabled === true}
-					label={t('use-stable-address')}
-					onChange={(e) =>
-						void handleToggleStableAddress(
-							(e.target as HTMLInputElement).checked,
-						)
-					}
-				/>
-				<Text className="bp3-text-muted">
-					<small>{t('use-stable-address-hint')}</small>
-				</Text>
+				<Button
+					id="connection-options-toggle"
+					minimal
+					small
+					icon={areOptionsOpen ? 'chevron-up' : 'chevron-down'}
+					onClick={() => setAreOptionsOpen((open) => !open)}
+				>
+					{t('connection-options')}
+				</Button>
+				<Collapse isOpen={areOptionsOpen} keepChildrenMounted>
+					<div style={{ textAlign: 'center', marginBottom: '10px' }}>
+						<Switch
+							id="stable-address-switch"
+							checked={stableAddress?.enabled === true}
+							label={t('use-stable-address')}
+							onChange={(e) =>
+								void handleToggleStableAddress(
+									(e.target as HTMLInputElement).checked,
+								)
+							}
+						/>
+						<Text className="bp3-text-muted">
+							<small>{t('use-stable-address-hint')}</small>
+						</Text>
+					</div>
+					<PreselectSourcePanel />
+				</Collapse>
 			</Row>
-
-			<PreselectSourcePanel />
 
 			<Row
 				style={{

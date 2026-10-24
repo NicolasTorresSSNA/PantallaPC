@@ -82,7 +82,9 @@ export default function IntermediateStep(
 				flexDirection: 'column',
 				justifyContent: 'center',
 				alignItems: 'center',
-				height: '260px',
+				// minHeight (no height): si un paso tiene mas contenido, el contenedor
+				// crece en vez de desbordarse sobre el indicador de pasos.
+				minHeight: '260px',
 				width: '100%',
 			}}
 		>

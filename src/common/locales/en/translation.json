@@ -191,5 +191,6 @@
 	"use-stable-address-hint": "Lets your phone keep its trusted identity when your PC IP changes. If your phone cannot open the .local address, turn this off.",
 	"share-on-connect-title": "What to share when a device connects",
 	"share-on-connect-hint": "Choose it now and sharing starts as soon as you accept the device, with no extra steps.",
-	"share-on-connect-clear": "Remove selection"
+	"share-on-connect-clear": "Remove selection",
+	"connection-options": "Connection options"
 }

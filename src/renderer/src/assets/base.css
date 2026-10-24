@@ -141,6 +141,13 @@ body {
 	background-color: var(--light-bg-color);
 }
 
+/* El contenido de un paso puede ser mas alto que la ventana: se desplaza. */
+#root {
+	height: 100vh;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
 /* for really small screen sizes (ex. Raspberry PI display etc. */
 @media screen and (max-height: 419px) {
 	body {

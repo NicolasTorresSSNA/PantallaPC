@@ -46,23 +46,20 @@ const PreselectSourcePanel: React.FC = () => {
 
 	// El overlay fija la fuente en la sesion en espera y luego llama a esto: se
 	// lee de ahi el id elegido y se guarda como preseleccion persistente.
-	const saveSelection = useCallback(
-		async (type: 'screen' | 'window') => {
-			const { ipcRenderer } = window.electron;
-			const id = await ipcRenderer.invoke(
-				IpcEvents.GetWaitingForConnectionSharingSessionSourceId,
-			);
-			if (typeof id === 'string' && id !== '') {
-				const ok = await ipcRenderer.invoke(IpcEvents.SetPreselectedSource, {
-					type,
-					id,
-				});
-				if (ok) setSelected({ type, id });
-			}
-			setIsOverlayOpen(false);
-		},
-		[],
-	);
+	const saveSelection = useCallback(async (type: 'screen' | 'window') => {
+		const { ipcRenderer } = window.electron;
+		const id = await ipcRenderer.invoke(
+			IpcEvents.GetWaitingForConnectionSharingSessionSourceId,
+		);
+		if (typeof id === 'string' && id !== '') {
+			const ok = await ipcRenderer.invoke(IpcEvents.SetPreselectedSource, {
+				type,
+				id,
+			});
+			if (ok) setSelected({ type, id });
+		}
+		setIsOverlayOpen(false);
+	}, []);
 
 	const clearSelection = useCallback(async () => {
 		await window.electron.ipcRenderer.invoke(
@@ -90,7 +87,7 @@ const PreselectSourcePanel: React.FC = () => {
 			</div>
 			{selected && (
 				<div
-					style={{ maxWidth: '280px', margin: '8px auto' }}
+					style={{ maxWidth: '220px', margin: '8px auto' }}
 					id="preselected-source-preview"
 				>
 					<SharingSourcePreviewCard sharingSourceID={selected.id} />
