@@ -1,3 +1,5 @@
+// Debe ir primero: fija la carpeta de datos antes de que otros modulos la lean.
+import './portableData';
 // override console early to catch all logs
 import {
 	overrideGlobalConsole,
@@ -135,7 +137,7 @@ export default class DeskreenApp {
 		});
 
 		app.whenReady().then(async () => {
-			app.setAppUserModelId('com.deskreen-ce.app');
+			app.setAppUserModelId('com.pantallapc.app');
 			if (process.platform === 'darwin') {
 				app.setActivationPolicy('regular');
 			}

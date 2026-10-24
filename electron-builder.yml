@@ -1,5 +1,5 @@
-appId: com.deskreen-ce.app
-productName: Deskreen CE
+appId: com.pantallapc.app
+productName: PantallaPC
 directories:
   buildResources: build
 files:
@@ -15,16 +15,12 @@ extraResources:
 asarUnpack:
   - resources/**
 win:
+  # Carpeta con PantallaPC.exe (sin instalador): los datos quedan en ./data
+  # junto al ejecutable. Sin firma de codigo.
   artifactName: ${name}-${version}-${arch}.${ext}
-  executableName: Deskreen CE
+  executableName: PantallaPC
   target:
-    - portable
-    - msi
-  azureSignOptions:
-    publisherName: "SERVICES DE DÉVELOPPEMENT DE LOGICIELS EFFICACES"
-    endpoint: "https://eus.codesigning.azure.net/"
-    codeSigningAccountName: "deskreen-web-app"
-    certificateProfileName: "DeskreenPro"
+    - dir
 nsis: null
 mac:
   artifactName: ${name}-${version}-${arch}.${ext}
@@ -46,8 +42,6 @@ linux:
 appImage:
   artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
-electronDownload:
-  mirror: https://npmmirror.com/mirrors/electron/
+publish: null
+# Usa el Electron ya instalado en node_modules (sin descargar otro).
+electronDist: node_modules/electron/dist
